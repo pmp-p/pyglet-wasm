@@ -1,7 +1,7 @@
 """Information about version and extensions of current GL implementation.
 
 Usage::
-    
+
     from pyglet.gl import gl_info
 
     if gl_info.have_extension('GL_NV_register_combiners'):
@@ -20,6 +20,7 @@ context::
         # ...
 
 """
+import sys
 import warnings
 
 from ctypes import c_char_p, cast
@@ -185,6 +186,11 @@ class GLInfo:
 
         :rtype: str
         """
+
+        import sys
+        WebGL = sys.platform in ('emscripten','wasi')
+        if WebGL:
+            return "gles"
         if not self._have_context:
             warnings.warn('No GL context created yet.')
         return self.opengl_api

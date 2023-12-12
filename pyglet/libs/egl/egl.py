@@ -9,8 +9,12 @@ from ctypes import *
 
 import pyglet.lib
 
-_lib = pyglet.lib.load_library('EGL')
-
+import sys
+WebGL = sys.platform in ('emscripten','wasi')
+if WebGL:
+    _lib = pyglet.lib.load_library(None)
+else:
+    _lib = pyglet.lib.load_library("EGL")
 
 __egl_h_ = 1 	# /usr/include/EGL/egl.h:2
 EGL_EGL_PROTOTYPES = 1 	# /usr/include/EGL/egl.h:42
@@ -123,9 +127,10 @@ eglChooseConfig.restype = EGLBoolean
 eglChooseConfig.argtypes = [EGLDisplay, POINTER(EGLint), POINTER(EGLConfig), EGLint, POINTER(EGLint)]
 
 # /usr/include/EGL/egl.h:151
-eglCopyBuffers = _lib.eglCopyBuffers
-eglCopyBuffers.restype = EGLBoolean
-eglCopyBuffers.argtypes = [EGLDisplay, EGLSurface, EGLNativePixmapType]
+if not WebGL:
+    eglCopyBuffers = _lib.eglCopyBuffers
+    eglCopyBuffers.restype = EGLBoolean
+    eglCopyBuffers.argtypes = [EGLDisplay, EGLSurface, EGLNativePixmapType]
 
 # /usr/include/EGL/egl.h:152
 eglCreateContext = _lib.eglCreateContext
@@ -133,14 +138,15 @@ eglCreateContext.restype = EGLContext
 eglCreateContext.argtypes = [EGLDisplay, EGLConfig, EGLContext, POINTER(EGLint)]
 
 # /usr/include/EGL/egl.h:153
-eglCreatePbufferSurface = _lib.eglCreatePbufferSurface
-eglCreatePbufferSurface.restype = EGLSurface
-eglCreatePbufferSurface.argtypes = [EGLDisplay, EGLConfig, POINTER(EGLint)]
+if not WebGL:
+    eglCreatePbufferSurface = _lib.eglCreatePbufferSurface
+    eglCreatePbufferSurface.restype = EGLSurface
+    eglCreatePbufferSurface.argtypes = [EGLDisplay, EGLConfig, POINTER(EGLint)]
 
-# /usr/include/EGL/egl.h:154
-eglCreatePixmapSurface = _lib.eglCreatePixmapSurface
-eglCreatePixmapSurface.restype = EGLSurface
-eglCreatePixmapSurface.argtypes = [EGLDisplay, EGLConfig, EGLNativePixmapType, POINTER(EGLint)]
+    # /usr/include/EGL/egl.h:154
+    eglCreatePixmapSurface = _lib.eglCreatePixmapSurface
+    eglCreatePixmapSurface.restype = EGLSurface
+    eglCreatePixmapSurface.argtypes = [EGLDisplay, EGLConfig, EGLNativePixmapType, POINTER(EGLint)]
 
 # /usr/include/EGL/egl.h:155
 eglCreateWindowSurface = _lib.eglCreateWindowSurface
@@ -257,19 +263,20 @@ PFNEGLRELEASETEXIMAGEPROC = CFUNCTYPE(EGLBoolean, EGLDisplay, EGLSurface, EGLint
 PFNEGLSURFACEATTRIBPROC = CFUNCTYPE(EGLBoolean, EGLDisplay, EGLSurface, EGLint, EGLint) 	# /usr/include/EGL/egl.h:195
 PFNEGLSWAPINTERVALPROC = CFUNCTYPE(EGLBoolean, EGLDisplay, EGLint) 	# /usr/include/EGL/egl.h:196
 # /usr/include/EGL/egl.h:198
-eglBindTexImage = _lib.eglBindTexImage
-eglBindTexImage.restype = EGLBoolean
-eglBindTexImage.argtypes = [EGLDisplay, EGLSurface, EGLint]
+if not WebGL:
+    eglBindTexImage = _lib.eglBindTexImage
+    eglBindTexImage.restype = EGLBoolean
+    eglBindTexImage.argtypes = [EGLDisplay, EGLSurface, EGLint]
 
-# /usr/include/EGL/egl.h:199
-eglReleaseTexImage = _lib.eglReleaseTexImage
-eglReleaseTexImage.restype = EGLBoolean
-eglReleaseTexImage.argtypes = [EGLDisplay, EGLSurface, EGLint]
+    # /usr/include/EGL/egl.h:199
+    eglReleaseTexImage = _lib.eglReleaseTexImage
+    eglReleaseTexImage.restype = EGLBoolean
+    eglReleaseTexImage.argtypes = [EGLDisplay, EGLSurface, EGLint]
 
-# /usr/include/EGL/egl.h:200
-eglSurfaceAttrib = _lib.eglSurfaceAttrib
-eglSurfaceAttrib.restype = EGLBoolean
-eglSurfaceAttrib.argtypes = [EGLDisplay, EGLSurface, EGLint, EGLint]
+    # /usr/include/EGL/egl.h:200
+    eglSurfaceAttrib = _lib.eglSurfaceAttrib
+    eglSurfaceAttrib.restype = EGLBoolean
+    eglSurfaceAttrib.argtypes = [EGLDisplay, EGLSurface, EGLint, EGLint]
 
 # /usr/include/EGL/egl.h:201
 eglSwapInterval = _lib.eglSwapInterval
@@ -323,9 +330,10 @@ eglQueryAPI.restype = EGLenum
 eglQueryAPI.argtypes = []
 
 # /usr/include/EGL/egl.h:246
-eglCreatePbufferFromClientBuffer = _lib.eglCreatePbufferFromClientBuffer
-eglCreatePbufferFromClientBuffer.restype = EGLSurface
-eglCreatePbufferFromClientBuffer.argtypes = [EGLDisplay, EGLenum, EGLClientBuffer, EGLConfig, POINTER(EGLint)]
+if not WebGL:
+    eglCreatePbufferFromClientBuffer = _lib.eglCreatePbufferFromClientBuffer
+    eglCreatePbufferFromClientBuffer.restype = EGLSurface
+    eglCreatePbufferFromClientBuffer.argtypes = [EGLDisplay, EGLenum, EGLClientBuffer, EGLConfig, POINTER(EGLint)]
 
 # /usr/include/EGL/egl.h:247
 eglReleaseThread = _lib.eglReleaseThread
@@ -423,58 +431,60 @@ PFNEGLGETPLATFORMDISPLAYPROC = CFUNCTYPE(EGLDisplay, EGLenum, POINTER(None), POI
 PFNEGLCREATEPLATFORMWINDOWSURFACEPROC = CFUNCTYPE(EGLSurface, EGLDisplay, EGLConfig, POINTER(None), POINTER(EGLAttrib)) 	# /usr/include/EGL/egl.h:340
 PFNEGLCREATEPLATFORMPIXMAPSURFACEPROC = CFUNCTYPE(EGLSurface, EGLDisplay, EGLConfig, POINTER(None), POINTER(EGLAttrib)) 	# /usr/include/EGL/egl.h:341
 PFNEGLWAITSYNCPROC = CFUNCTYPE(EGLBoolean, EGLDisplay, EGLSync, EGLint) 	# /usr/include/EGL/egl.h:342
-# /usr/include/EGL/egl.h:344
-eglCreateSync = _lib.eglCreateSync
-eglCreateSync.restype = EGLSync
-eglCreateSync.argtypes = [EGLDisplay, EGLenum, POINTER(EGLAttrib)]
 
-# /usr/include/EGL/egl.h:345
-eglDestroySync = _lib.eglDestroySync
-eglDestroySync.restype = EGLBoolean
-eglDestroySync.argtypes = [EGLDisplay, EGLSync]
+if not WebGL:
+    # /usr/include/EGL/egl.h:344
+    eglCreateSync = _lib.eglCreateSync
+    eglCreateSync.restype = EGLSync
+    eglCreateSync.argtypes = [EGLDisplay, EGLenum, POINTER(EGLAttrib)]
 
-# /usr/include/EGL/egl.h:346
-eglClientWaitSync = _lib.eglClientWaitSync
-eglClientWaitSync.restype = EGLint
-eglClientWaitSync.argtypes = [EGLDisplay, EGLSync, EGLint, EGLTime]
+    # /usr/include/EGL/egl.h:345
+    eglDestroySync = _lib.eglDestroySync
+    eglDestroySync.restype = EGLBoolean
+    eglDestroySync.argtypes = [EGLDisplay, EGLSync]
 
-# /usr/include/EGL/egl.h:347
-eglGetSyncAttrib = _lib.eglGetSyncAttrib
-eglGetSyncAttrib.restype = EGLBoolean
-eglGetSyncAttrib.argtypes = [EGLDisplay, EGLSync, EGLint, POINTER(EGLAttrib)]
+    # /usr/include/EGL/egl.h:346
+    eglClientWaitSync = _lib.eglClientWaitSync
+    eglClientWaitSync.restype = EGLint
+    eglClientWaitSync.argtypes = [EGLDisplay, EGLSync, EGLint, EGLTime]
 
-# /usr/include/EGL/egl.h:348
-eglCreateImage = _lib.eglCreateImage
-eglCreateImage.restype = EGLImage
-eglCreateImage.argtypes = [EGLDisplay, EGLContext, EGLenum, EGLClientBuffer, POINTER(EGLAttrib)]
+    # /usr/include/EGL/egl.h:347
+    eglGetSyncAttrib = _lib.eglGetSyncAttrib
+    eglGetSyncAttrib.restype = EGLBoolean
+    eglGetSyncAttrib.argtypes = [EGLDisplay, EGLSync, EGLint, POINTER(EGLAttrib)]
 
-# /usr/include/EGL/egl.h:349
-eglDestroyImage = _lib.eglDestroyImage
-eglDestroyImage.restype = EGLBoolean
-eglDestroyImage.argtypes = [EGLDisplay, EGLImage]
+    # /usr/include/EGL/egl.h:348
+    eglCreateImage = _lib.eglCreateImage
+    eglCreateImage.restype = EGLImage
+    eglCreateImage.argtypes = [EGLDisplay, EGLContext, EGLenum, EGLClientBuffer, POINTER(EGLAttrib)]
 
-# /usr/include/EGL/egl.h:350
-eglGetPlatformDisplay = _lib.eglGetPlatformDisplay
-eglGetPlatformDisplay.restype = EGLDisplay
-eglGetPlatformDisplay.argtypes = [EGLenum, POINTER(None), POINTER(EGLAttrib)]
+    # /usr/include/EGL/egl.h:349
+    eglDestroyImage = _lib.eglDestroyImage
+    eglDestroyImage.restype = EGLBoolean
+    eglDestroyImage.argtypes = [EGLDisplay, EGLImage]
 
-# /usr/include/EGL/egl.h:351
-eglCreatePlatformWindowSurface = _lib.eglCreatePlatformWindowSurface
-eglCreatePlatformWindowSurface.restype = EGLSurface
-eglCreatePlatformWindowSurface.argtypes = [EGLDisplay, EGLConfig, POINTER(None), POINTER(EGLAttrib)]
+    # /usr/include/EGL/egl.h:350
+    eglGetPlatformDisplay = _lib.eglGetPlatformDisplay
+    eglGetPlatformDisplay.restype = EGLDisplay
+    eglGetPlatformDisplay.argtypes = [EGLenum, POINTER(None), POINTER(EGLAttrib)]
 
-# /usr/include/EGL/egl.h:352
-eglCreatePlatformPixmapSurface = _lib.eglCreatePlatformPixmapSurface
-eglCreatePlatformPixmapSurface.restype = EGLSurface
-eglCreatePlatformPixmapSurface.argtypes = [EGLDisplay, EGLConfig, POINTER(None), POINTER(EGLAttrib)]
+    # /usr/include/EGL/egl.h:351
+    eglCreatePlatformWindowSurface = _lib.eglCreatePlatformWindowSurface
+    eglCreatePlatformWindowSurface.restype = EGLSurface
+    eglCreatePlatformWindowSurface.argtypes = [EGLDisplay, EGLConfig, POINTER(None), POINTER(EGLAttrib)]
 
-# /usr/include/EGL/egl.h:353
-eglWaitSync = _lib.eglWaitSync
-eglWaitSync.restype = EGLBoolean
-eglWaitSync.argtypes = [EGLDisplay, EGLSync, EGLint]
+    # /usr/include/EGL/egl.h:352
+    eglCreatePlatformPixmapSurface = _lib.eglCreatePlatformPixmapSurface
+    eglCreatePlatformPixmapSurface.restype = EGLSurface
+    eglCreatePlatformPixmapSurface.argtypes = [EGLDisplay, EGLConfig, POINTER(None), POINTER(EGLAttrib)]
+
+    # /usr/include/EGL/egl.h:353
+    eglWaitSync = _lib.eglWaitSync
+    eglWaitSync.restype = EGLBoolean
+    eglWaitSync.argtypes = [EGLDisplay, EGLSync, EGLint]
 
 
-__all__ = ['__egl_h_', 'EGL_EGL_PROTOTYPES', 'EGL_VERSION_1_0', 'EGLBoolean', 'EGLint',
+exports = ['__egl_h_', 'EGL_EGL_PROTOTYPES', 'EGL_VERSION_1_0', 'EGLBoolean', 'EGLint',
 'EGLDisplay', 'EGLConfig', 'EGLSurface', 'EGLContext',
 '__eglMustCastToProperFunctionPointerType', 'EGL_ALPHA_SIZE',
 'EGL_BAD_ACCESS', 'EGL_BAD_ALLOC', 'EGL_BAD_ATTRIBUTE', 'EGL_BAD_CONFIG',
@@ -566,3 +576,9 @@ __all__ = ['__egl_h_', 'EGL_EGL_PROTOTYPES', 'EGL_VERSION_1_0', 'EGLBoolean', 'E
 'eglCreateImage', 'eglDestroyImage', 'eglGetPlatformDisplay',
 'eglCreatePlatformWindowSurface', 'eglCreatePlatformPixmapSurface',
 'eglWaitSync']
+__all__= []
+for e in exports:
+    if globals().get(e,None):
+        __all__.append(e)
+    else:
+        print(f'584: missing {e}')

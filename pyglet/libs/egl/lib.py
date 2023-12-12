@@ -5,8 +5,12 @@ import pyglet.util
 
 
 __all__ = ['link_EGL']
-
-egl_lib = pyglet.lib.load_library('EGL')
+import sys
+WebGL = sys.platform in ('emscripten','wasi')
+if WebGL:
+    egl_lib = pyglet.lib.load_library(None)
+else:
+    egl_lib = pyglet.lib.load_library('EGL')
 
 # Look for eglGetProcAddress
 eglGetProcAddress = getattr(egl_lib, 'eglGetProcAddress')

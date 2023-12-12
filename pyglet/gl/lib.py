@@ -1,3 +1,4 @@
+import sys
 import ctypes
 
 import pyglet
@@ -89,8 +90,9 @@ def decorate_function(func, name):
 link_AGL = None
 link_GLX = None
 link_WGL = None
-
-if pyglet.compat_platform in ('win32', 'cygwin'):
+if sys.platform in ('emscripten','wasi'):
+    from pyglet.gl.lib_glx import link_GL
+elif pyglet.compat_platform in ('win32', 'cygwin'):
     from pyglet.gl.lib_wgl import link_GL, link_WGL
 elif pyglet.compat_platform == 'darwin':
     from pyglet.gl.lib_agl import link_GL, link_AGL

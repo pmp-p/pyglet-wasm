@@ -1,12 +1,10 @@
-from pyglet import gl
 from pyglet import app
 from pyglet import window
 from pyglet import canvas
 
-
 class Display:
     """A display device supporting one or more screens.
-    
+
     .. versionadded:: 1.2
     """
 
@@ -26,17 +24,17 @@ class Display:
         """Create a display connection for the given name and screen.
 
         On X11, :attr:`name` is of the form ``"hostname:display"``, where the
-        default is usually ``":1"``.  On X11, :attr:`x_screen` gives the X 
-        screen number to use with this display.  A pyglet display can only be 
+        default is usually ``":1"``.  On X11, :attr:`x_screen` gives the X
+        screen number to use with this display.  A pyglet display can only be
         used with one X screen; open multiple display connections to access
-        multiple X screens.  
-        
+        multiple X screens.
+
         Note that TwinView, Xinerama, xrandr and other extensions present
         multiple monitors on a single X screen; this is usually the preferred
         mechanism for working with multiple monitors under X11 and allows each
         screen to be accessed through a single pyglet`~pyglet.canvas.Display`
 
-        On platforms other than X11, :attr:`name` and :attr:`x_screen` are 
+        On platforms other than X11, :attr:`name` and :attr:`x_screen` are
         ignored; there is only a single display device on these systems.
 
         :Parameters:
@@ -52,7 +50,7 @@ class Display:
         """Get the available screens.
 
         A typical multi-monitor workstation comprises one :class:`Display`
-        with multiple :class:`Screen` s.  This method returns a list of 
+        with multiple :class:`Screen` s.  This method returns a list of
         screens which can be enumerated to select one for full-screen display.
 
         For the purposes of creating an OpenGL config, the default screen
@@ -92,19 +90,19 @@ class Screen:
     has no effect unless the window is made fullscreen, in which case
     the window will fill only that particular virtual screen.
 
-    The :attr:`width` and :attr:`height` attributes of a screen give the 
-    current resolution of the screen.  The :attr:`x` and :attr:`y` attributes 
-    give the global location of the top-left corner of the screen.  This is 
-    useful for determining if screens are arranged above or next to one 
+    The :attr:`width` and :attr:`height` attributes of a screen give the
+    current resolution of the screen.  The :attr:`x` and :attr:`y` attributes
+    give the global location of the top-left corner of the screen.  This is
+    useful for determining if screens are arranged above or next to one
     another.
-    
+
     Use :func:`~Display.get_screens` or :func:`~Display.get_default_screen`
     to obtain an instance of this class.
     """
 
     def __init__(self, display, x, y, width, height):
         """
-        
+
         :parameters:
             `display` : `~pyglet.canvas.Display`
                 :attr:`display`
@@ -148,6 +146,7 @@ class Screen:
         :return: A configuration supported by the platform that best
             fulfils the needs described by the template.
         """
+        from pyglet import gl
         configs = None
         if template is None:
             for template_config in [gl.Config(double_buffer=True, depth_size=24, major_version=3, minor_version=3),
@@ -252,7 +251,7 @@ class Screen:
     def set_mode(self, mode):
         """Set the display mode for this screen.
 
-        The mode must be one previously returned by :meth:`get_mode` or 
+        The mode must be one previously returned by :meth:`get_mode` or
         :meth:`get_modes`.
 
         :Parameters:
@@ -274,7 +273,7 @@ class ScreenMode:
     Applications should not construct `ScreenMode` instances themselves; see
     :meth:`Screen.get_modes`.
 
-    The :attr:`depth` and :attr:`rate` variables may be ``None`` if the 
+    The :attr:`depth` and :attr:`rate` variables may be ``None`` if the
     operating system does not provide relevant data.
 
     .. versionadded:: 1.2
@@ -304,7 +303,7 @@ class ScreenMode:
 
     def __init__(self, screen):
         """
-        
+
         :parameters:
             `screen` : `Screen`
         """
@@ -325,11 +324,12 @@ class Canvas:
 
     def __init__(self, display):
         """
-        
+
         :parameters:
             `display` : `Display`
                 :attr:`display`
-                
+
         """
         self.display = display
         """Display this canvas was created on."""
+

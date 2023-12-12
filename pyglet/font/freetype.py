@@ -2,10 +2,15 @@ import ctypes
 import warnings
 from collections import namedtuple
 
+import sys
+WebGL = sys.platform in ('emscripten','wasi')
+
+
 from pyglet.util import asbytes, asstr
 from pyglet.font import base
 from pyglet import image
-from pyglet.font.fontconfig import get_fontconfig
+if not WebGL:
+    from pyglet.font.fontconfig import get_fontconfig
 from pyglet.font.freetype_lib import *
 
 
@@ -176,11 +181,16 @@ class FreeTypeFont(base.Font):
             self._load_font_face_from_system()
 
     def _load_font_face_from_system(self):
-        match = get_fontconfig().find_font(self._name, self.size, self.bold, self.italic)
-        if not match:
-            raise base.FontException(f"Could not match font '{self._name}'")
-        self.filename = match.file
-        self.face = FreeTypeFace.from_fontconfig(match)
+        if WebGL:
+            #match = "/data/data/org.python/assets/site-packages/pygame/freesansbolf.ttf"
+            self.filename = "/data/data/org.python/assets/site-packages/pygame/FreeSerif.ttf"
+            self.face = FreeTypeFace.from_file(self.filename)
+        else:
+            match = get_fontconfig().find_font(self._name, self.size, self.bold, self.italic)
+            if not match:
+                raise base.FontException(f"Could not match font '{self._name}'")
+            self.filename = match.file
+            self.face = FreeTypeFace.from_fontconfig(match)
 
     @classmethod
     def have_font(cls, name):
@@ -274,6 +284,8 @@ class FreeTypeFace:
                 raise
 
     def get_character_index(self, character):
+        if WebGL:
+            return ord(character)
         return get_fontconfig().char_index(self.ft_face, character)
 
     def get_glyph_slot(self, glyph_index):

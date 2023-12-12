@@ -4,7 +4,6 @@ from ctypes import *
 from .base import Config, CanvasConfig, Context
 from pyglet.canvas.xlib import XlibCanvas
 from pyglet.gl import glx
-from pyglet.gl import glxext_arb
 from pyglet.gl import glx_info
 from pyglet.gl import glxext_mesa
 from pyglet.gl import lib
@@ -153,6 +152,7 @@ class XlibContext(Context):
         else:
             share_context = None
 
+        from pyglet.gl import glxext_arb
         attribs = []
         if self.config.major_version is not None:
             attribs.extend([glxext_arb.GLX_CONTEXT_MAJOR_VERSION_ARB, self.config.major_version])
@@ -215,6 +215,7 @@ class XlibContext(Context):
             self.glx_context = None
 
     def set_vsync(self, vsync=True):
+        from pyglet.gl import glxext_arb
         self._vsync = vsync
         interval = vsync and 1 or 0
         try:
@@ -231,6 +232,7 @@ class XlibContext(Context):
         return self._vsync
 
     def _wait_vsync(self):
+        from pyglet.gl import glxext_arb
         if self._vsync and self._have_SGI_video_sync and self._use_video_sync:
             count = c_uint()
             glxext_arb.glXGetVideoSyncSGI(byref(count))

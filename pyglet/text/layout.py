@@ -132,7 +132,8 @@ from pyglet.font.base import grapheme_break
 _is_pyglet_doc_run = hasattr(sys, "is_pyglet_doc_run") and sys.is_pyglet_doc_run
 
 
-layout_vertex_source = """#version 330 core
+layout_vertex_source = """#version 300 es
+    precision mediump float;
     in vec3 position;
     in vec4 colors;
     in vec3 tex_coords;
@@ -153,10 +154,12 @@ layout_vertex_source = """#version 330 core
     } window;
 
     mat4 m_rotation = mat4(1.0);
-    vec3 v_anchor = vec3(anchor.x, anchor.y, 0);
+    vec3 v_anchor;
+
 
     void main()
     {
+        v_anchor = vec3(anchor.x, anchor.y, 0);
         m_rotation[0][0] =  cos(-radians(rotation));
         m_rotation[0][1] =  sin(-radians(rotation));
         m_rotation[1][0] = -sin(-radians(rotation));
@@ -170,7 +173,8 @@ layout_vertex_source = """#version 330 core
     }
 """
 
-layout_fragment_source = """#version 330 core
+layout_fragment_source = """#version 300 es
+    precision mediump float;
     in vec4 text_colors;
     in vec2 texture_coords;
     in vec4 vert_position;
@@ -193,7 +197,8 @@ layout_fragment_source = """#version 330 core
     }
 """
 
-layout_fragment_image_source = """#version 330 core
+layout_fragment_image_source = """#version 300 es
+    precision mediump float;
     in vec4 text_colors;
     in vec2 texture_coords;
     in vec4 vert_position;
@@ -218,7 +223,8 @@ layout_fragment_image_source = """#version 330 core
     }
 """
 
-decoration_vertex_source = """#version 330 core
+decoration_vertex_source = """#version 300 es
+    precision mediump float;
     in vec3 position;
     in vec4 colors;
     in vec3 translation;
@@ -226,7 +232,7 @@ decoration_vertex_source = """#version 330 core
     in vec2 anchor;
     in float rotation;
     in float visible;
-    
+
     out vec4 vert_colors;
     out vec4 vert_position;
 
@@ -237,10 +243,11 @@ decoration_vertex_source = """#version 330 core
     } window;
 
     mat4 m_rotation = mat4(1.0);
-    vec3 v_anchor = vec3(anchor.x, anchor.y, 0);
+    vec3 v_anchor;
 
     void main()
     {
+        v_anchor = vec3(anchor.x, anchor.y, 0);
         m_rotation[0][0] =  cos(-radians(rotation));
         m_rotation[0][1] =  sin(-radians(rotation));
         m_rotation[1][0] = -sin(-radians(rotation));
@@ -253,7 +260,8 @@ decoration_vertex_source = """#version 330 core
     }
 """
 
-decoration_fragment_source = """#version 330 core
+decoration_fragment_source = """#version 300 es
+    precision mediump float;
     in vec4 vert_colors;
     in vec4 vert_position;
 
@@ -263,7 +271,7 @@ decoration_fragment_source = """#version 330 core
     uniform vec4 scissor_area;
 
     void main()
-    {   
+    {
         final_colors = vert_colors;
         if (scissor == true) {
             if (vert_position.x < scissor_area[0]) discard;                     // left

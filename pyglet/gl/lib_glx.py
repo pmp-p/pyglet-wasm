@@ -8,7 +8,12 @@ from pyglet.util import asbytes
 
 __all__ = ['link_GL', 'link_GLX']
 
-gl_lib = pyglet.lib.load_library('GL')
+import sys
+WebGL = sys.platform in ('emscripten','wasi')
+if WebGL:
+    gl_lib = pyglet.lib.load_library(None)
+else:
+    gl_lib = pyglet.lib.load_library('GL')
 
 # Look for glXGetProcAddressARB extension, use it as fallback (for ATI fglrx and DRI drivers).
 try:

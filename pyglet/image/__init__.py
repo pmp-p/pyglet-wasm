@@ -1640,7 +1640,7 @@ class TextureArray(Texture, UniformTextureSequence):
         if image.width > self.width or image.height > self.height:
             raise TextureArraySizeExceeded(f'Image ({image.width}x{image.height}) exceeds the size of the TextureArray ({self.width}x{self.height})')
 
-    def add(self, image: pyglet.image.ImageData):
+    def add(self, image: ImageData):
         if len(self.items) >= self.max_depth:
             raise TextureArrayDepthExceeded(f"TextureArray is full.")
 

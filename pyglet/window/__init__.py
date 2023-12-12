@@ -90,6 +90,8 @@ above, "Working with multiple screens")::
 
 import sys
 from typing import Tuple
+import os
+import platform
 
 import pyglet
 import pyglet.window.key
@@ -100,7 +102,6 @@ from pyglet.math import Mat4
 from pyglet.event import EventDispatcher
 from pyglet.window import key, event
 from pyglet.graphics import shader
-
 
 _is_pyglet_doc_run = hasattr(sys, "is_pyglet_doc_run") and sys.is_pyglet_doc_run
 
@@ -424,7 +425,7 @@ class BaseWindow(EventDispatcher, metaclass=_WindowMetaclass):
     """
     _default_fragment_source = """#version 150 core
         out vec4 color;
-        
+
         void main()
         {
             color = vec4(1.0, 0.0, 0.0, 1.0);
@@ -510,6 +511,7 @@ class BaseWindow(EventDispatcher, metaclass=_WindowMetaclass):
         self._event_queue = []
 
         if not display:
+            from pyglet.canvas import get_display
             display = pyglet.canvas.get_display()
 
         if not screen:
@@ -534,20 +536,6 @@ class BaseWindow(EventDispatcher, metaclass=_WindowMetaclass):
         if not config.is_complete():
             config = screen.get_best_config(config)
 
-        if not context:
-            context = config.create_context(gl.current_context)
-
-        # Set these in reverse order to above, to ensure we get user preference
-        self._context = context
-        self._config = self._context.config
-
-        # XXX deprecate config's being screen-specific
-        if hasattr(self._config, 'screen'):
-            self._screen = self._config.screen
-        else:
-            self._screen = screen
-        self._display = self._screen.display
-
         if fullscreen:
             if width is None and height is None:
                 self._windowed_size = self._default_width, self._default_height
@@ -562,6 +550,32 @@ class BaseWindow(EventDispatcher, metaclass=_WindowMetaclass):
 
         self._width = width
         self._height = height
+
+        if pyglet.WebGL:
+            canvas = os.environ.get("WebGL","#canvas")[1:]
+            print(f"WebGL: id={canvas} {self._width}x{self._height}")
+            platform.window.eval(f"""
+const canvas = document.getElementById("{canvas}")
+canvas.width = "{self._width}"
+canvas.height= "{self._height}"
+window_resize()
+""")
+
+
+        if not context:
+            context = config.create_context(gl.current_context)
+
+        # Set these in reverse order to above, to ensure we get user preference
+        self._context = context
+        self._config = self._context.config
+
+        # XXX deprecate config's being screen-specific
+        if hasattr(self._config, 'screen'):
+            self._screen = self._config.screen
+        else:
+            self._screen = screen
+        self._display = self._screen.display
+
         self._resizable = resizable
         self._fullscreen = fullscreen
         self._style = style
@@ -1911,19 +1925,22 @@ if _is_pyglet_doc_run:
     Window = BaseWindow
     Window.__name__ = 'Window'
     del BaseWindow
-
 else:
-    # Try to determine which platform to use.
-    if pyglet.options['headless']:
-        from pyglet.window.headless import HeadlessWindow as Window
-    elif pyglet.compat_platform == 'darwin':
-        from pyglet.window.cocoa import CocoaWindow as Window
-    elif pyglet.compat_platform in ('win32', 'cygwin'):
-        from pyglet.window.win32 import Win32Window as Window
+    if not pyglet.WebGL:
+        # Try to determine which platform to use.
+        if pyglet.options['headless']:
+            from pyglet.window.headless import HeadlessWindow as Window
+        elif pyglet.compat_platform == 'darwin':
+            from pyglet.window.cocoa import CocoaWindow as Window
+        elif pyglet.compat_platform in ('win32', 'cygwin'):
+            from pyglet.window.win32 import Win32Window as Window
+        else:
+            from pyglet.window.xlib import XlibWindow as Window
+        # Create shadow window. (trickery is for circular import)
+        if not _is_pyglet_doc_run:
+            pyglet.window = sys.modules[__name__]
+            gl._create_shadow_window()
     else:
-        from pyglet.window.xlib import XlibWindow as Window
+        import pyglet.canvas
+        from pyglet.window.headless import HeadlessWindow as Window
 
-# Create shadow window. (trickery is for circular import)
-if not _is_pyglet_doc_run:
-    pyglet.window = sys.modules[__name__]
-    gl._create_shadow_window()

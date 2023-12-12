@@ -737,7 +737,7 @@ class ShaderSource:
         self._version = self._find_glsl_version()
 
         if pyglet.gl.current_context.get_info().get_opengl_api() == "gles":
-            self._lines[0] = "#version 310 es"
+            self._lines[0] = "#version 300 es"
             self._lines.insert(1, "precision mediump float;")
 
             if self._type == GL_GEOMETRY_SHADER:

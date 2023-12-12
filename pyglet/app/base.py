@@ -119,6 +119,20 @@ class EventLoop(event.EventDispatcher):
             window.dispatch_event('on_refresh', dt)
             window.flip()
 
+    async def async_run(self):
+        self.has_exit = False
+        import asyncio
+        import pyglet.window
+        import pyglet.app
+        pyglet.window.Window._enable_event_queue = False
+
+        while not self.has_exit:
+            timeout = self.idle()
+            self._redraw_windows(1/60)
+            pyglet.app.platform_event_loop.step(timeout)
+            await asyncio.sleep(0)
+
+
     def run(self, interval=1/60):
         """Begin processing events, scheduled functions and window updates.
 
@@ -136,6 +150,12 @@ class EventLoop(event.EventDispatcher):
         Developers are discouraged from overriding this method, as the
         implementation is platform-specific.
         """
+        if sys.platform in ('emscripten','wasi'):
+            import asyncio
+            loop = asyncio.get_event_loop()
+            loop.create_task(self.async_run())
+            return
+
         if interval is None:
             # User application will manage a custom _redraw_windows() method
             pass
@@ -231,9 +251,9 @@ class EventLoop(event.EventDispatcher):
         """Flag indicating if the event loop will exit in
         the next iteration.  When set, all waiting threads are interrupted (see
         :py:meth:`sleep`).
-        
+
         Thread-safe since pyglet 1.2.
-    
+
         :see: `exit`
         :type: bool
         """

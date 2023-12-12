@@ -5,7 +5,7 @@ More information is available at http://www.pyglet.org
 
 import os
 import sys
-
+WebGL = sys.platform in ('emscripten','wasi')
 from typing import TYPE_CHECKING
 
 #: The release version
@@ -339,47 +339,25 @@ class _ModuleProxy:
             setattr(module, name, value)
 
 
-# Lazily load all modules, except if performing
-# type checking or code inspection.
-if TYPE_CHECKING:
-    from . import app
-    from . import canvas
-    from . import clock
-    from . import customtypes
-    from . import event
-    from . import font
-    from . import gl
-    from . import graphics
-    from . import gui
-    from . import input
-    from . import image
-    from . import lib
-    from . import math
-    from . import media
-    from . import model
-    from . import resource
-    from . import sprite
-    from . import shapes
-    from . import text
-    from . import window
-else:
-    app = _ModuleProxy('app')
-    canvas = _ModuleProxy('canvas')
-    clock = _ModuleProxy('clock')
-    customtypes = _ModuleProxy('customtypes')
-    event = _ModuleProxy('event')
-    font = _ModuleProxy('font')
-    gl = _ModuleProxy('gl')
-    graphics = _ModuleProxy('graphics')
-    gui = _ModuleProxy('gui')
-    image = _ModuleProxy('image')
-    input = _ModuleProxy('input')
-    lib = _ModuleProxy('lib')
-    math = _ModuleProxy('math')
-    media = _ModuleProxy('media')
-    model = _ModuleProxy('model')
-    resource = _ModuleProxy('resource')
-    sprite = _ModuleProxy('sprite')
-    shapes = _ModuleProxy('shapes')
-    text = _ModuleProxy('text')
-    window = _ModuleProxy('window')
+from . import app
+from . import resource
+from . import clock
+from . import customtypes
+from . import event
+from . import math
+from . import input
+from . import lib
+from . import gl
+from . import canvas
+from . import image
+from . import media
+from . import window
+from . import graphics
+from . import sprite
+from . import shapes
+from . import gui
+from . import model
+from . import font
+from . import text
+
+

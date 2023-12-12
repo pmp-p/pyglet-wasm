@@ -6,6 +6,8 @@ rendering and grouping.
 
 See the :ref:`guide_graphics` for details on how to use this graphics API.
 """
+import sys
+WebGL = sys.platform in ('emscripten','wasi')
 
 import ctypes
 import weakref
@@ -28,8 +30,8 @@ def draw(size, mode, **data):
     :Parameters:
         `size` : int
             Number of vertices given
-        `mode` : gl primitive type 
-            OpenGL drawing mode, e.g. ``GL_TRIANGLES``, 
+        `mode` : gl primitive type
+            OpenGL drawing mode, e.g. ``GL_TRIANGLES``,
             avoiding quotes.
         `**data` : keyword arguments for passing vertex attribute data.
             The keyword should be the vertex attribute name, and the
@@ -158,7 +160,7 @@ _vertex_source = """#version 330 core
     {
         mat4 projection;
         mat4 view;
-    } window;  
+    } window;
 
     void main()
     {
@@ -225,7 +227,7 @@ class Batch:
 
     def __init__(self):
         """Create a graphics batch."""
-        # Mapping to find domain.  
+        # Mapping to find domain.
         # group -> (attributes, mode, indexed) -> domain
         self.group_map = {}
 
@@ -254,14 +256,14 @@ class Batch:
         """Migrate a vertex list to another batch and/or group.
 
         `vertex_list` and `mode` together identify the vertex list to migrate.
-        `group` and `batch` are new owners of the vertex list after migration.  
+        `group` and `batch` are new owners of the vertex list after migration.
 
         The results are undefined if `mode` is not correct or if `vertex_list`
         does not belong to this batch (they are not checked and will not
         necessarily throw an exception immediately).
 
         `batch` can remain unchanged if only a group change is desired.
-        
+
         :Parameters:
             `vertex_list` : `~pyglet.graphics.vertexdomain.VertexList`
                 A vertex list currently belonging to this batch.
@@ -297,7 +299,7 @@ class Batch:
             domain = domain_map[key]
         except KeyError:
             # Create domain
-            if indexed:
+            if indexed and not pyglet.WebGL:
                 domain = vertexdomain.IndexedVertexDomain(program, attributes)
             else:
                 domain = vertexdomain.VertexDomain(program, attributes)
@@ -531,13 +533,13 @@ class Group:
 
     def set_state(self):
         """Apply the OpenGL state change.
-        
+
         The default implementation does nothing."""
         pass
 
     def unset_state(self):
         """Repeal the OpenGL state change.
-        
+
         The default implementation does nothing."""
         pass
 

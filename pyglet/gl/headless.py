@@ -1,7 +1,7 @@
 from ctypes import *
-
+import pyglet
 from pyglet import gl
-from pyglet.canvas.headless import HeadlessCanvas
+
 from pyglet.libs.egl import egl
 from pyglet.libs.egl.egl import *
 
@@ -20,6 +20,9 @@ _fake_gl_attributes = {
 
 class HeadlessConfig(Config):
     def match(self, canvas):
+
+        from pyglet.canvas.headless import HeadlessCanvas
+
         if not isinstance(canvas, HeadlessCanvas):
             raise RuntimeError('Canvas must be an instance of HeadlessCanvas')
 
@@ -51,7 +54,6 @@ class HeadlessConfig(Config):
 
         result = [HeadlessCanvasConfig(canvas, c, self) for c in configs]
         return result
-
 
 class HeadlessCanvasConfig(CanvasConfig):
     attribute_ids = {
@@ -85,8 +87,14 @@ class HeadlessCanvasConfig(CanvasConfig):
         for name, value in _fake_gl_attributes.items():
             setattr(self, name, value)
 
+        if pyglet.WebGL:
+            setattr(self, "opengl_api", "gles")
+            setattr(self, "major_version", 2)
+            setattr(self, "minor_version", 0)
+
     def compatible(self, canvas):
         # TODO check more
+        from pyglet.canvas.headless import HeadlessCanvas
         return isinstance(canvas, HeadlessCanvas)
 
     def create_context(self, share):
@@ -95,10 +103,16 @@ class HeadlessCanvasConfig(CanvasConfig):
 
 class HeadlessContext(Context):
     def __init__(self, config, share):
+
+
         super(HeadlessContext, self).__init__(config, share)
 
         self.display_connection = config.canvas.display._display_connection
 
+        if pyglet.WebGL:
+            import embed
+            self.egl_context = embed.webgl()
+            return
         self.egl_context = self._create_egl_context(share)
         if not self.egl_context:
             raise gl.ContextException('Could not create GL context')

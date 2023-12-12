@@ -2,7 +2,12 @@ from ctypes import *
 from .base import FontException
 import pyglet.lib
 
-_libfreetype = pyglet.lib.load_library('freetype')
+import sys
+WebGL = sys.platform in ('emscripten','wasi')
+if WebGL:
+    _libfreetype = pyglet.lib.load_library(None)
+else:
+    _libfreetype = pyglet.lib.load_library('freetype')
 
 _font_data = {}
 
@@ -14,7 +19,10 @@ def _get_function(name, argtypes, rtype):
         func.restype = rtype
         return func
     except AttributeError as e:
-        raise ImportError(e)
+        if WebGL:
+            print(f"23: {name} not found")
+        else:
+            raise ImportError(e)
 
 
 FT_Byte = c_char

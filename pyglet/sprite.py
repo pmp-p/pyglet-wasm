@@ -22,7 +22,7 @@ draw event handler::
 
     pyglet.app.run()
 
-The sprite can be moved by modifying the :py:attr:`~pyglet.sprite.Sprite.x` and 
+The sprite can be moved by modifying the :py:attr:`~pyglet.sprite.Sprite.x` and
 :py:attr:`~pyglet.sprite.Sprite.y` properties.  Other
 properties determine the sprite's :py:attr:`~pyglet.sprite.Sprite.rotation`,
 :py:attr:`~pyglet.sprite.Sprite.scale` and
@@ -106,7 +106,7 @@ vertex_source = """#version 150 core
         m_translate[3][0] = translate.x;
         m_translate[3][1] = translate.y;
         m_translate[3][2] = translate.z;
-        m_rotation[0][0] =  cos(-radians(rotation)); 
+        m_rotation[0][0] =  cos(-radians(rotation));
         m_rotation[0][1] =  sin(-radians(rotation));
         m_rotation[1][0] = -sin(-radians(rotation));
         m_rotation[1][1] =  cos(-radians(rotation));
@@ -792,7 +792,7 @@ class Sprite(event.EventDispatcher):
 Sprite.register_event_type('on_animation_end')
 
 
-class AdvancedSprite(pyglet.sprite.Sprite):
+class AdvancedSprite(Sprite):
     """Is a sprite that lets you change the shader program during initialization and after
     For advanced users who understand shaders."""
     def __init__(self,
